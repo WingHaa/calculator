@@ -1,0 +1,23 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: solid 1px #000000;
+}
+
+.display {
+  text-align: right;
+}
+
+.control {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.operate {
+  display: grid;
+}
