@@ -39,42 +39,45 @@ function powerOnCalculator() {
 
 let calcArray = [];
 let isLastKeyPressOperator = false;
-const display = document.querySelector('.display');
+const resultDisplay = document.querySelector('.result-display');
+const operationDisplay = document.querySelector('.operation-display');
 
 function insertNumber(event) {
-  let operand = display.textContent;
+  let operand = resultDisplay.textContent;
   let input = event.target.value;
   if (!isLastKeyPressOperator && input === '0' && operand === '0') return; //stop when user 1st press 0
   if (!isLastKeyPressOperator && input !== '0' && operand === '0') operand = input; //remove the 0 at the start
   else operand = operand.concat(input);
   if (isLastKeyPressOperator) {
     operand = input;
-    calcArray.push(display.currentOperator);
+    calcArray.push(resultDisplay.currentOperator);
     isLastKeyPressOperator = false;
   } 
-  display.currentOperand = operand;
+  resultDisplay.currentOperand = operand;
   console.log(calcArray)
   return displayNumber(operand);
 };
 
 function displayNumber(string) {
-  return display.textContent = string;
+  return resultDisplay.textContent = string;
 };
 
 function updateOperator(event) {
   const operator = event.target.value;
-  display.currentOperator = operator;
-  if (isLastKeyPressOperator === false) {   
-    if (typeof display.currentOperand === 'undefined') display.currentOperand = '0'; //set first operand as 0 when user 1st press is an operator
-    calcArray.push(display.currentOperand);
-    display.currentOperand = '0'
+  resultDisplay.currentOperator = operator;
+  if (isLastKeyPressOperator === false) {
+    if (typeof resultDisplay.currentOperand === 'undefined') 
+    resultDisplay.currentOperand = '0'; //set first operand as 0 when user 1st press is an operator
+    calcArray.push(resultDisplay.currentOperand);
+    resultDisplay.currentOperand = '0';
     if (calcArray.length === 3) {
       let result = parseOperation(calcArray);
       calcArray.splice(0, 3, result);
-      display.textContent = result;
+      resultDisplay.textContent = result;
     }
     isLastKeyPressOperator = true;
   }
+  operationDisplay.textContent = `${calcArray[0]} ${operator}`;
   console.log(calcArray)
 };
 

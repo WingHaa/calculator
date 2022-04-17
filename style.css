@@ -4,7 +4,7 @@
   border: solid 1px #000000;
 }
 
-.display {
+.operation-display, .result-display {
   text-align: right;
 }
 
