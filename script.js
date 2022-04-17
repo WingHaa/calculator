@@ -1,22 +1,19 @@
 'use strict';
 
 function add(a, b) {
-  if (!b) b = a;
   return a + b;
 };
 
-function subtract(a, b) { 
-  if (!b) b = a; 
+function subtract(a, b) {
   return a - b;
 };
 
 function multiply(a, b) {
-  if (!b) b = a;
   return a * b;
 };
 
 function divide(a, b) {
-  if (!b) b = a; 
+  if (b === 0) return throwError();
 	return a / b;
 };
 
@@ -39,10 +36,18 @@ function powerOnCalculator() {
 
 let calcArray = [];
 let isLastKeyPressOperator = false;
+let isLastKeyPressEqual = false;
 const resultDisplay = document.querySelector('.result-display');
 const operationDisplay = document.querySelector('.operation-display');
 
 function insertNumber(event) {
+  if (isLastKeyPressEqual) {
+    operationDisplay.textContent ='';
+    resultDisplay.textContent ='';
+    calcArray = [];
+    isLastKeyPressEqual = false;
+    isLastKeyPressOperator = false;
+  }
   let operand = resultDisplay.textContent;
   let input = event.target.value;
   if (!isLastKeyPressOperator && input === '0' && operand === '0') return; //stop when user 1st press 0
@@ -65,24 +70,43 @@ function displayNumber(string) {
 function updateOperator(event) {
   const operator = event.target.value;
   resultDisplay.currentOperator = operator;
-  if (isLastKeyPressOperator === false) {
+  if (isLastKeyPressEqual) isLastKeyPressEqual = false;
+  if (!isLastKeyPressOperator) {
     if (typeof resultDisplay.currentOperand === 'undefined') 
-    resultDisplay.currentOperand = '0'; //set first operand as 0 when user 1st press is an operator
+      resultDisplay.currentOperand = '0'; //set first operand as 0 when user 1st press is an operator
     calcArray.push(resultDisplay.currentOperand);
-    resultDisplay.currentOperand = '0';
-    if (calcArray.length === 3) {
-      let result = parseOperation(calcArray);
-      calcArray.splice(0, 3, result);
-      resultDisplay.textContent = result;
-    }
-    isLastKeyPressOperator = true;
+    if (calcArray.length === 3) parseOperation(calcArray);
   }
   operationDisplay.textContent = `${calcArray[0]} ${operator}`;
+  isLastKeyPressOperator = true;
   console.log(calcArray)
 };
 
 function parseOperation(array) {
-  let firstOperand = parseInt(array[0]);
-  let secondOperand = parseInt(array[2]);
-  return operate(firstOperand, secondOperand, array[1]);
+  const firstOperand = parseInt(array[0]);
+  const secondOperand = parseInt(array[2]);
+  const operator = array[1]
+  const result = operate(firstOperand, secondOperand, operator);
+  calcArray.splice(0, 3, result);
+  console.log(calcArray)
+  return resultDisplay.textContent = result;
 };
+
+const calculateButton = document.querySelector('.calculate');
+calculateButton.addEventListener('click', function() {
+  if (calcArray.length < 2) return;
+  isLastKeyPressEqual = true;
+  isLastKeyPressOperator = true;
+  calcArray.push(resultDisplay.currentOperand);
+  operationDisplay.textContent = `${calcArray[0]} ${calcArray[1]} ${calcArray[2]} =`
+  const result = parseOperation(calcArray);
+  console.log(calcArray)
+  return displayNumber(result);
+});
+
+// function throwError() {
+//   turn off buttons except number and AC
+//   show error can't divide by 0
+//   remove old event listeners
+//   add new event listener to restart the calculator and run powerOnCalculator function
+// }
