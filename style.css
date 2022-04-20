@@ -1,23 +1,110 @@
 * {
   margin: 0;
   padding: 0;
-  border: solid 1px #000000;
 }
 
-.operation-display, .result-display {
+body {
+  height: 100vh;
+}
+
+button {
+  padding: 8px 12px;
+  height: 48px;
+}
+
+.calculator {
+  margin: auto;
+  margin-top: 5%;
+  width: 20%;
+  border: 1px solid;
+  display: grid;
+  grid-template-columns: 1fr;
+  min-width: 150px;
+}
+
+.operation-display,
+.result-display {
+  display: grid;
   text-align: right;
 }
 
 .control {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-areas: "ac ac del del"
+                       "num7 num8 num9 multiply"
+                       "num4 num5 num6 divide"
+                       "num1 num2 num3 add"
+                       "num0 period equal subtract";
 }
 
-.numpad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+#reset-key {
+  grid-area: ac;
 }
 
-.operate {
-  display: grid;
+#del-key {
+  grid-area: del;
+}
+
+#num7 {
+  grid-area: num7;
+}
+
+#num8 {
+  grid-area: num8;
+}
+
+#num9 {
+  grid-area: num9;
+}
+
+#num4 {
+  grid-area: num4;
+}
+
+#num5 {
+  grid-area: num5;
+}
+
+#num6 {
+  grid-area: num6;
+}
+
+#num1 {
+  grid-area: num1;
+}
+
+#num2 {
+  grid-area: num2;
+}
+
+#num3 {
+  grid-area: num3;
+}
+
+#num0 {
+  grid-area: num0;
+}
+
+#multiply {
+  grid-area: multiply;
+}
+
+#divide {
+  grid-area: divide;
+}
+
+#add {
+  grid-area: add;
+}
+
+#subtract {
+  grid-area: subtract;
+}
+
+#equal {
+  grid-area: equal;
+}
+
+#period-key {
+  grid-area: period;
 }
