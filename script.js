@@ -41,6 +41,35 @@ function parseOperation(array) {
   return displayResult(result);
 }
 
+function clearState() {
+  operationDisplay.textContent ='';
+  resultDisplay.textContent ='0';
+  resultDisplay.currentOperand = '';
+  periodButton.disabled = false;
+  CALC_ARRAY = [];
+  lastKeyEqual = false;
+  lastKeyOperator = false;
+}
+
+function calculate() {
+  if (CALC_ARRAY.length < 2 || lastKeyOperator) return;
+  if (periodButton.disabled = true) periodButton.disabled = false;
+  
+  lastKeyEqual = true;
+  lastKeyOperator = true;
+  
+  CALC_ARRAY.push(resultDisplay.currentOperand);
+  operationDisplay.textContent = `${CALC_ARRAY[0]} ${CALC_ARRAY[1]} ${CALC_ARRAY[2]} =`;
+  const result = parseOperation(CALC_ARRAY);
+  return displayResult(result);
+}
+
+function deleteNumber() {
+  let slicedString = resultDisplay.textContent.slice(0, -1);
+  resultDisplay.currentOperand = slicedString;
+  return displayResult(slicedString);
+}
+
 window.addEventListener('load', powerOnCalculator);
 
 function powerOnCalculator() {
@@ -57,43 +86,42 @@ function powerOnCalculator() {
   clearButton.addEventListener('click', clearState);
 
   periodButton.addEventListener('click', insertNumber);
-}
 
-function clearState() {
-  operationDisplay.textContent ='';
-  resultDisplay.textContent ='0';
-  resultDisplay.currentOperand = '';
-  periodButton.disabled = false;
-  CALC_ARRAY = [];
-  isLastKeyPressEqual = false;
-  isLastKeyPressOperator = false;
+  const delButton = document.querySelector('.del');
+  delButton.addEventListener('click', deleteNumber);
 }
 
 let CALC_ARRAY = [];
-let isLastKeyPressOperator = false;
-let isLastKeyPressEqual = false;
+let lastKeyOperator = false;
+let lastKeyEqual = false;
 const resultDisplay = document.querySelector('.result-display');
 const operationDisplay = document.querySelector('.operation-display');
 const periodButton = document.querySelector('.dot');
 
 function insertNumber(event) {
-  if (isLastKeyPressEqual) clearState();
-  
-  let operand = resultDisplay.textContent; //declare after check equal key to make sure no value is set after number press
+  if (lastKeyEqual) clearState();
+
+  //!after check equal key to make sure no value is set after number press
+  let operand = resultDisplay.textContent; 
   let input = event.target.value;
   
-  if (!isLastKeyPressOperator && input === '0' && operand === '0') return; //stop when user 1st press 0
-  if (!isLastKeyPressOperator && input !== '.' && input !== '0' && operand === '0') operand = input; //remove the 0 at the start
-  else operand = operand.concat(input);
-  
-  if (isLastKeyPressOperator) {//let user input fresh number after an operator
+  if (!lastKeyOperator) {
+    //*stop when user 1st press 0 //remove the 0 at the start
+    if (input === '0' && operand === '0') return; 
+    if (input !== '0' && input !== '.' && operand === '0') operand = input;
+    else operand = operand.concat(input);
+  };
+
+  //*let user input fresh number after an operator
+  if (lastKeyOperator) {
     if (input === '.') operand = '0.';
     else operand = input;
     CALC_ARRAY.push(resultDisplay.currentOperator);
-    isLastKeyPressOperator = false;
+    lastKeyOperator = false;
   };
 
-  if (operand.includes('.')) periodButton.disabled = true;
+  //!after key press check so there won't be any weird input
+  if (operand.includes('.')) periodButton.disabled = true; 
   else periodButton.disabled = false;
 
   resultDisplay.currentOperand = operand;
@@ -104,8 +132,8 @@ function updateOperator(event) {
   const operator = event.target.value;
   resultDisplay.currentOperator = operator;
 
-  if (isLastKeyPressEqual) isLastKeyPressEqual = false;
-  if (!isLastKeyPressOperator) {
+  if (lastKeyEqual) lastKeyEqual = false;
+  if (!lastKeyOperator) {
     if (typeof resultDisplay.currentOperand === 'undefined' ||
       resultDisplay.currentOperand === '') resultDisplay.currentOperand = '0'; //set first operand as 0 when user 1st press is an operator
     
@@ -113,24 +141,12 @@ function updateOperator(event) {
     if (CALC_ARRAY.length === 3) parseOperation(CALC_ARRAY);
   };
 
-  isLastKeyPressOperator = true;
+  lastKeyOperator = true;
   operationDisplay.textContent = `${CALC_ARRAY[0]} ${operator}`;
 
   if (periodButton.disabled = true) periodButton.disabled = false;
 }
 
-function calculate() {
-  if (CALC_ARRAY.length < 2 || isLastKeyPressOperator) return;
-  if (periodButton.disabled = true) periodButton.disabled = false;
-  
-  isLastKeyPressEqual = true;
-  isLastKeyPressOperator = true;
-
-  CALC_ARRAY.push(resultDisplay.currentOperand);
-  operationDisplay.textContent = `${CALC_ARRAY[0]} ${CALC_ARRAY[1]} ${CALC_ARRAY[2]} =`
-  const result = parseOperation(CALC_ARRAY);
-  return displayResult(result);
-}
 // function throwError() {
 //   turn off buttons except number and AC
 //   show error can't divide by 0
