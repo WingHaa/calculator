@@ -92,17 +92,20 @@ function powerOnCalculator() {
   const equalButton = document.querySelector('.calculate');
   const clearButton = document.querySelector('.reset');
   const delButton = document.querySelector('.del');
+  const currentYear = new Date().getFullYear();
   
   equalButton.removeEventListener('click', ERROR_HANDLER);
   numberButtons.forEach(button => button.removeEventListener('click', ERROR_HANDLER));
 
   numberButtons.forEach(button => button.addEventListener('click', insertNumber));
   operatorButtons.forEach(button => button.addEventListener('click', updateOperator));
+  document.addEventListener('keydown', inputByKeyboard);
   equalButton.addEventListener('click', calculate);
   clearButton.addEventListener('click', clearState);
   periodButton.addEventListener('click', insertNumber);
   delButton.addEventListener('click', deleteNumber);
-  document.addEventListener('keydown', inputByKeyboard);
+  document.querySelector('.copyright').textContent += 
+    `Copyright © ${currentYear} WingHaa`;
 }
 
 function inputByKeyboard(event) {
@@ -116,17 +119,12 @@ function inputByKeyboard(event) {
   if (buttonType === 'calculate') return calculate();
 }
 
-function checkMouseOrKeyInput(event) {
-  if (!event.value) return event.target.value;
-  return event.value;
-}
-
 function insertNumber(event) {
   if (lastKeyEqual) clearState();
 
   //!after check equal key to make sure no value is set after number press
   let operand = resultDisplay.textContent;
-  let input = checkMouseOrKeyInput(event);
+  const input = (event.value || event.target.value);
   
   if (!lastKeyOperator) {
     //*stop when user 1st press 0 //remove the 0 at the start
@@ -153,7 +151,7 @@ function insertNumber(event) {
 }
 
 function updateOperator(event) {
-  const operator = checkMouseOrKeyInput(event);
+  const operator = (event.value || event.target.value);
   resultDisplay.currentOperator = operator;
 
   if (lastKeyEqual) lastKeyEqual = false;
