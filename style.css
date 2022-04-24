@@ -5,27 +5,44 @@
 
 body {
   height: 100vh;
+  
 }
 
 button {
-  padding: 8px 12px;
-  height: 48px;
+  height: 78px;
+  font-size: 32px;
 }
 
 .calculator {
-  margin: auto;
-  margin-top: 5%;
-  width: 20%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 350px;
   border: 1px solid;
   display: grid;
   grid-template-columns: 1fr;
-  min-width: 150px;
 }
 
-.operation-display,
-.result-display {
-  display: grid;
+.operation-display, .result-display {
   text-align: right;
+  height: 48px;
+  border: 1px solid;
+  font-weight: lighter;
+  font-family: monospace;
+}
+
+.operation-display {
+  text-align: right;
+  height: 24px;
+  font-size: 21px;
+}
+
+.result-display {
+  text-align: right;
+  height: 48px;
+  font-size: 42px;
 }
 
 .control {

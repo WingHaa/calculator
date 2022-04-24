@@ -1,19 +1,28 @@
 'use strict';
 
 function add(a, b) {
-  return a + b;
+  return roundNumber(a + b);
 }
 
 function subtract(a, b) {
-  return a - b;
+  return roundNumber(a - b);
 }
 
 function multiply(a, b) {
-  return a * b;
+  return roundNumber(a * b);
 }
 
 function divide(a, b) {
-	return a / b;
+  return roundNumber(a / b);
+}
+
+function roundNumber(num) {
+  const numString = num.toString();
+  if (numString.length > 12) {
+    if (numString.includes('.')) return num.toFixed(12);
+    return Math.round(num);
+  }
+  return num;
 }
 
 function operate(firstNum, secondNum, operator) {
@@ -25,7 +34,6 @@ function operate(firstNum, secondNum, operator) {
 
 function calculate() {
   if (CALC_ARRAY.length < 2 || lastKeyOperator) return;
-  if (periodButton.disabled = true) periodButton.disabled = false;
   
   lastKeyEqual = true;
   lastKeyOperator = true;
@@ -56,14 +64,12 @@ function parseOperation(array) {
 
 function clearState() {
   const operatorButtons = document.querySelectorAll('.operator');
-  operatorButtons.forEach(button => button.disabled = false);
   const delButton = document.querySelector('.del');
+  operatorButtons.forEach(button => button.disabled = false);
   delButton.disabled = false;
-
   operationDisplay.textContent = '';
   resultDisplay.textContent = '0';
   resultDisplay.currentOperand = '';
-  periodButton.disabled = false;
   CALC_ARRAY = [];
   lastKeyEqual = false;
   lastKeyOperator = false;
@@ -75,7 +81,10 @@ function deleteNumber() {
   return displayResult(slicedString);
 }
 
-window.addEventListener('load', powerOnCalculator);
+function checkIfInputHavePeriod(string) {
+  if (string.includes('.')) return true;
+  return false;
+}
 
 function powerOnCalculator() {
   const numberButtons = document.querySelectorAll('.number');
@@ -85,7 +94,6 @@ function powerOnCalculator() {
   const delButton = document.querySelector('.del');
   
   equalButton.removeEventListener('click', ERROR_HANDLER);
-
   numberButtons.forEach(button => button.removeEventListener('click', ERROR_HANDLER));
 
   numberButtons.forEach(button => button.addEventListener('click', insertNumber));
@@ -94,21 +102,31 @@ function powerOnCalculator() {
   clearButton.addEventListener('click', clearState);
   periodButton.addEventListener('click', insertNumber);
   delButton.addEventListener('click', deleteNumber);
+  document.addEventListener('keydown', inputByKeyboard);
 }
 
-let CALC_ARRAY = [];
-let lastKeyOperator = false;
-let lastKeyEqual = false;
-const resultDisplay = document.querySelector('.result-display');
-const operationDisplay = document.querySelector('.operation-display');
-const periodButton = document.querySelector('.dot');
+function inputByKeyboard(event) {
+  const key = document.querySelector(`button[data-key='${event.keyCode}']`);
+  if (!key) return;
+  const buttonType = key.className;
+  if (buttonType === 'number' || buttonType === 'dot') return insertNumber(key);
+  if (buttonType === 'operator') return updateOperator(key);
+  if (buttonType === 'reset') return clearState();
+  if (buttonType === 'del') return deleteNumber();
+  if (buttonType === 'calculate') return calculate();
+}
+
+function checkMouseOrKeyInput(event) {
+  if (!event.value) return event.target.value;
+  return event.value;
+}
 
 function insertNumber(event) {
   if (lastKeyEqual) clearState();
 
   //!after check equal key to make sure no value is set after number press
-  let operand = resultDisplay.textContent; 
-  let input = event.target.value;
+  let operand = resultDisplay.textContent;
+  let input = checkMouseOrKeyInput(event);
   
   if (!lastKeyOperator) {
     //*stop when user 1st press 0 //remove the 0 at the start
@@ -124,17 +142,18 @@ function insertNumber(event) {
     CALC_ARRAY.push(resultDisplay.currentOperator);
     lastKeyOperator = false;
   };
+  
+  if (operand.length > 12) return;
 
   //!after key press check so there won't be any weird input
-  if (operand.includes('.')) periodButton.disabled = true; 
-  else periodButton.disabled = false;
+  if(checkIfInputHavePeriod(resultDisplay.textContent) && input === '.') return;
 
   resultDisplay.currentOperand = operand;
   return displayResult(operand);
 }
 
 function updateOperator(event) {
-  const operator = event.target.value;
+  const operator = checkMouseOrKeyInput(event);
   resultDisplay.currentOperator = operator;
 
   if (lastKeyEqual) lastKeyEqual = false;
@@ -151,8 +170,6 @@ function updateOperator(event) {
 
   lastKeyOperator = true;
   operationDisplay.textContent = `${CALC_ARRAY[0]} ${operator}`;
-
-  if (periodButton.disabled = true) periodButton.disabled = false;
 }
 
 function checkDivisionByZero() {
@@ -160,23 +177,31 @@ function checkDivisionByZero() {
 }
 
 function error() {
-//   turn off buttons except number and AC
+  //   turn off buttons except number and AC
   const numberButtons = document.querySelectorAll('.number');
   const operatorButtons = document.querySelectorAll('.operator');
   const equalButton = document.querySelector('.calculate');
   const delButton = document.querySelector('.del');
   operatorButtons.forEach(button => button.disabled = true);
   delButton.disabled = true;
-  periodButton.disabled = true;
   //   show error can't divide by 0
-  displayResult(`Can't divide by the number of friends you have!`);
+  displayResult(`Can't ÷ by 0!`);
   //   remove old event listeners
   equalButton.removeEventListener('click', calculate);
   numberButtons.forEach(button => button.removeEventListener('click', insertNumber));
-//   add new event listener to restart the calculator and run powerOnCalculator function
+  //   add new event listener to restart the calculator and run powerOnCalculator function
   equalButton.addEventListener('click', ERROR_HANDLER);
   numberButtons.forEach(button => button.addEventListener('click', ERROR_HANDLER));
 }
+
+window.addEventListener('load', powerOnCalculator);
+
+let CALC_ARRAY = [];
+let lastKeyOperator = false;
+let lastKeyEqual = false;
+const resultDisplay = document.querySelector('.result-display');
+const operationDisplay = document.querySelector('.operation-display');
+const periodButton = document.querySelector('.dot');
 
 const ERROR_HANDLER = () => {
   clearState();
